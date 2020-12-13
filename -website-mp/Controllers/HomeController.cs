@@ -2,36 +2,32 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc; 
 using Microsoft.Extensions.Logging;
 using _website_mp.Models;
+using Newtonsoft.Json;
 
 namespace _website_mp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
+        public ViewResult Index()
         {
             return View();
         }
-
-        public IActionResult Privacy()
+        public string getCategory()
         {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            TypeProductModel model = new TypeProductModel();
+            List<string[][]> rs = new List<string[][]>();
+            for (int i = 1; i < 5; i++)
+            {
+                string[][] r = model.getTypeProductByIdCategory(Convert.ToString(i));
+                rs.Add(r);
+            }
+            return JsonConvert.SerializeObject(rs.ToArray());
         }
     }
 }
