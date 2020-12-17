@@ -1,16 +1,12 @@
-
+const BASEURL = "" //GLOBAL VAR
 test = null
 
 /**
  * 
  * 
- * Handle for HOME SITE
- * add ro cart, 
- * 
- * get img in C#
+ * Image handle
  * 
  */
-
 getImgHex = function (arr) {
     arr = arr.split("-")
     var result = "";
@@ -20,17 +16,52 @@ getImgHex = function (arr) {
     return result;
 }
 
-loadImgUser = function () {
+/**
+ * 
+ * 
+ * Handle for HOME SITE
+ * add ro cart, 
+ * 
+ * 
+ * 
+ */
+loadImageAllProduct = function(){
+    arr = $('.img_p')
+    for (i = 0; i < arr.length; i++) {
+        id = arr.eq(i).attr('id_p')
+        t = arr.eq(i)
+        $.ajax({
+            type: "POST",
+            url: "/product/GetImageProduct",
+            data: { 'id': id },
+            dataType: 'JSON'
+        }).then(
+            function (res) {
+                if (res.img == "none") {
+                    $(".img_p[id_p='" + res.id + "']").attr('src', "/img/product.png");
+                } else {
+                    $(".img_p[id_p='" + res.id + "']").attr('src', getImgHex(res.img))
+                }
+            },
+            function () {
+                alert("error img")
+            }
+        )
+    }
+}
+
+loadImageProduct = function (id_p) {
     $.ajax({
         type: "POST",
-        url: "/user/GetImgUser",
+        url: "/product/GetImageProduct",
+        data: { 'id': id_p },
         dataType: 'JSON'
     }).then(
         function (res) {
-            if (res == "none") {
-                $("img#img").attr('src', "/img/user.png")
+            if (res.img == "none") {
+                $(".img_p[id_p='" + res.id + "']").attr('src', "/img/product.png");
             } else {
-                $("img#img").attr('src', getImgHex(res))
+                $(".img_p[id_p='" + res.id + "']").attr('src', getImgHex(res.img))
             }
         },
         function () {
@@ -39,10 +70,86 @@ loadImgUser = function () {
     )
 }
 
+$(document).ready(function () {
+    $(document).on("click", "a.page-link", function (e) {
+        e.preventDefault()
+    })
+    $(document).on("click", "button#sreach-product", function () {
+        arr = $(".product")
+        arr.attr("show", "show")
+        arr.removeAttr("hidden")
+        s = $("input#sreach").val().toLowerCase();
+
+        for (i = 0; i < arr.length; i++) {
+            n = arr.eq(i).find("a.name-product").text().toLowerCase();
+            if (n.search(s) == -1) {
+                arr.eq(i).attr("hidden", "true")
+                arr.eq(i).attr("show", "hide")
+            }
+        }
+        $("#pagination").remove()
+        paging()
+    })
+})
+
+paging = function (pa = 1) {
+    bd = $("#bodyy")
+    arr = $(".product[show='show']")
+    pag = $("#pagination")
+    l = arr.length
+    ck = false
+    if (pa == 0) {
+        pa = parseInt(pag.find("li.page-item.active").text()) - 1
+        if (pa == 0) pa = 1
+    }
+    if (pa == -1) {
+        pa = parseInt(pag.find("li.page-item.active").text()) + 1
+        if (pa == parseInt(l / 15) + 2) pa = parseInt(l / 15) + 1
+    }
+    s = 15 * (pa - 1)
+    e = 15 * (pa)
+    for (i = 0; i < l; i++) {
+        if (i >= s && i < e) {
+            ck = true
+            arr.eq(i).removeAttr("hidden")
+        } else {
+            arr.eq(i).attr("hidden", "true")
+        }
+    }
+    if (ck) {
+        if (pag.length == 0) {
+            p = '<div class="mt-2 p-0 col-12 d-flex flex-row-reverse" id="pagination">'
+            p += '<ul class="pagination">'
+            p += '<li class="page-item"><a class="page-link" onclick="paging(0)" href="">Trước</a></li>'
+            for (i = 0; i < l / 15; i++) {
+                if (i == pa - 1) {
+                    p += '<li class="page-item active"><a class="page-link" onclick="paging(' + (i + 1) + ')" href="">' + (i + 1)
+                    p += '</a></li>'
+                } else {
+                    p += '<li class="page-item"><a class="page-link" onclick="paging(' + (i + 1) + ')" href="">' + (i + 1)
+                    p += '</a></li>'
+                }
+            }
+            p += '<li class="page-item"><a class="page-link" onclick="paging(-1)" href="">Sau</a></li>'
+            p += '</ul>'
+            p += '</div>'
+            bd.after(p)
+        } else {
+            ar = pag.find("li.page-item")
+            for (i = 0; i < ar.length; i++) {
+                if (i == pa) {
+                    ar.eq(i).addClass("active")
+                } else {
+                    ar.eq(i).removeClass("active")
+                }
+            }
+        }
+    }
+}
 loadProduct = function () {
     $.ajax({
         type: "POST",
-        url: "/product/getAllProduct",
+        url: BASEURL + "/product/getAllProduct",
         dataType: 'JSON'
     }).then(
         // resolve/success callback
@@ -50,6 +157,8 @@ loadProduct = function () {
             for (i = 0; i < response.length; i++) {
                 $("#bodyy").append(response[i])
             }
+            paging()
+            loadImageAllProduct()
         },
         // reject/failure callback
         function () {
@@ -61,20 +170,18 @@ loadProduct = function () {
 loadCategory = function () {
     $.ajax({
         type: "POST",
-        url: "/home/getCategory",
+        url: BASEURL + "/home/getCategory",
         dataType: 'JSON'
     }).then(
         // resolve/success callback
         function (response) {
-            console.log(response)
-            test = response;
             for (i = 0; i < response.length; i++) {
                 s = '<ul class="dropdown-menu dropdown-menu-left">'
                 for (j = 0; j < response[i].length; j++) {
                     id_Ca = response[i][j][0]
                     name_Ca = response[i][j][1]
                     s += '<li><a class="dropdown-item" href="' +
-                        '/product/getByType/' + id_Ca + '">' + name_Ca + '</a></li>'
+                        BASEURL + '/product/getByType/' + id_Ca + '">' + name_Ca + '</a></li>'
                 }
                 s += '</ul>'
                 $("a.nav-link[id_ca='" + (i + 1) + "']").after(s)
@@ -82,7 +189,7 @@ loadCategory = function () {
         },
         // reject/failure callback
         function () {
-            alert('There was some error! category');
+            alert('There was some error!');
         }
     )
 }
@@ -121,17 +228,17 @@ modifyTable = function (tableID) {
     length.find("select").addClass('form-control ml-2 mr-2')
 }
 
-initTable = function (tableID, dataLink) {
+initTable = function (tableID, dataLink, callback) {
     $(tableID).addClass('nowrap')
     $(tableID).DataTable({
         responsive: true,
         "destroy": true,
         "ajax": {
-            "url": dataLink,
+            "url": BASEURL + dataLink,
             "type": "POST",
             "dataSrc": "data"
         },
-        "initComplete": function (settings, json) {
+        "initComplete": function (settings, json, callback) {
             modifyTable(tableID)
         }
     });
@@ -141,7 +248,7 @@ loadInsertP = function () {
 
     $.ajax({
         type: "POST",
-        url: "/admin/getTypeProductForTagSelect",
+        url: BASEURL + "/admin/getTypeProductForTagSelect",
         dataType: 'JSON'
     }).then(
         // resolve/success callback
@@ -162,7 +269,7 @@ loadInsertP = function () {
     )
     $.ajax({
         type: "POST",
-        url: "/admin/getWarehouseForTagSelect",
+        url: BASEURL + "/admin/getWarehouseForTagSelect",
         dataType: 'JSON'
     }).then(
         // resolve/success callback
@@ -181,6 +288,7 @@ loadInsertP = function () {
 
                 len_o = $("select#Warehouse:first option").length
                 len = $(".form-row").length
+                console.log(len_o + "  " + len)
                 if (len_o == len) $("button.AddWarehouse").attr('disabled', 'true')
             }
         },
@@ -207,6 +315,7 @@ $(document).ready(function () {
         tb_id = "#" + $(this).attr('tb_id')
 
         $(tb_id).DataTable().column(col).search(val).draw()
+        console.log(col + " " + val)
     })
     /**
      * 
@@ -249,7 +358,7 @@ $(document).ready(function () {
         status = false
         $.ajax({
             type: "POST",
-            url: link,
+            url: BASEURL + link,
             data: { 'Account': $(this).attr('account') },
             dataType: 'JSON'
         }).then(
@@ -291,7 +400,7 @@ $(document).ready(function () {
         status = false
         $.ajax({
             type: "POST",
-            url: link,
+            url: BASEURL + link,
             data: { 'id': $(this).attr('id_w') },
             dataType: 'JSON'
         }).then(
@@ -360,7 +469,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "/admin/saveWarehouse",
+            url: BASEURL + "/admin/saveWarehouse",
             data: data,
             dataType: 'JSON'
         }).then(
@@ -385,6 +494,7 @@ $(document).ready(function () {
     $(document).on('click', '#warehouse_table .detail', function () {
         id = $(this).attr('id_w')
         initTable("#warehouse_detail_table", "/admin/detailsWarehouse/" + id)
+
     })
 
     /**
@@ -424,7 +534,7 @@ $(document).ready(function () {
         if (data.name != "" && data.address != "" && data.city != "" && data.province != "") {
             $.ajax({
                 type: 'POST',
-                url: '/admin/insertWarehouse',
+                url: BASEURL + '/admin/insertWarehouse',
                 data: data,
                 dataType: 'JSON'
             }).then(
@@ -472,7 +582,7 @@ $(document).ready(function () {
         console.log($(this).attr('id_tp'))
         $.ajax({
             type: "POST",
-            url: link,
+            url: BASEURL + link,
             data: { 'id': $(this).attr('id_tp') },
             dataType: 'JSON'
         }).then(
@@ -535,7 +645,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "/admin/saveTypeProduct",
+            url: BASEURL + "/admin/saveTypeProduct",
             data: data,
             dataType: 'JSON'
         }).then(
@@ -572,7 +682,7 @@ $(document).ready(function () {
         if (data.name != "") {
             $.ajax({
                 type: 'POST',
-                url: '/admin/insertTypeProduct',
+                url: BASEURL + '/admin/insertTypeProduct',
                 data: data,
                 dataType: 'JSON'
             }).then(
@@ -619,7 +729,7 @@ $(document).ready(function () {
         status = false
         $.ajax({
             type: "POST",
-            url: link,
+            url: BASEURL + link,
             data: { 'id': $(this).attr('id_p') },
             dataType: 'JSON'
         }).then(
@@ -721,7 +831,7 @@ $(document).ready(function () {
          */
         $.ajax({
             type: "POST",
-            url: "/admin/getOneProduct",
+            url: BASEURL + "/admin/getOneProduct",
             data: data,
             dataType: 'JSON'
         }).then(
@@ -746,7 +856,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "/admin/getTypeProductForTagSelect",
+            url: BASEURL + "/admin/getTypeProductForTagSelect",
             dataType: 'JSON'
         }).then(
             // resolve/success callback
@@ -769,7 +879,7 @@ $(document).ready(function () {
         Warehouse = null
         $.ajax({
             type: "POST",
-            url: "/admin/getWarehouseByIdProduct",
+            url: BASEURL + "/admin/getWarehouseByIdProduct",
             data: data,
             dataType: 'JSON'
         }).then(
@@ -780,7 +890,7 @@ $(document).ready(function () {
                     $("input.Quantity").val(0)
                     $.ajax({
                         type: "POST",
-                        url: "/admin/getWarehouseForTagSelect",
+                        url: BASEURL + "/admin/getWarehouseForTagSelect",
                         dataType: 'JSON'
                     }).then(
                         // resolve/success callback
@@ -858,7 +968,7 @@ $(document).ready(function () {
         }
         $.ajax({
             type: "POST",
-            url: "/admin/saveProduct",
+            url: BASEURL + "/admin/saveProduct",
             data: data,
             dataType: 'JSON'
         }).then(
@@ -868,6 +978,8 @@ $(document).ready(function () {
                     $("#product_table").DataTable().ajax.reload()
                     $('#modify-product').modal('toggle')
                     p_modify = null
+                } else {
+                    alert('error to save')
                 }
             },
             // reject/failure callback
@@ -943,13 +1055,14 @@ $(document).ready(function () {
         if (check) {
             $.ajax({
                 type: "POST",
-                url: "/admin/insertProduct",
+                url: BASEURL + "/admin/insertProduct",
                 data: data,
                 dataType: 'JSON'
             }).then(
                 // resolve/success callback
                 function (response) {
                     if (response.status) {
+                        $('.alert').remove()
                         s = '<div class="alert alert-success text-center" role="alert">'
                         s += 'Thêm loại sản phẩm thành công thành công!!'
                         s += '</div>'
@@ -962,6 +1075,265 @@ $(document).ready(function () {
                 }
             )
         }
+    })
+
+    /**
+     * 
+     * ORDER HANDLE admin site
+     * 
+     * 
+     */
+    // modify order
+    $(document).on('click', '#order_table .modify', function () {
+        o_id = $(this).attr('id_o')
+        $.ajax({
+            type: "POST",
+            url: BASEURL + "/admin/detailOrder",
+            data: { 'id_o': o_id },
+            dataType: 'JSON'
+        }).then(
+            function (res) {
+                o = res.order
+                $(".modal-body").attr('id_o', o.id)
+                $("input#Name").val(o.full_name)
+                $("input#Phone").val(o.phone)
+                $("input#shipping-fee").val(o.shipping_fee)
+                $("input#City").val(o.city)
+                $("input#Province").val(o.province)
+                $("input#Address").val(o.address)
+                od = res.od
+                w = res.w
+                $('.order-detail').empty()
+                for (i = 0; i < od.length; i++) {
+                    s = '<div class="form-group product-detail-order row">'
+                    s += '<label class="col-12"><strong><i class="fas fa-boxes"></i> Tên sản phẩm: </strong>'
+                    s += '<span class="name_product" id_p="' + od[i].id_product + '">' + od[i].name + '</span></label>'
+                    s += '<div class="form-group form-inline col-12"><strong class="col-4">Số lượng: &nbsp</strong>'
+                    s += '<input type="number" class="form-control quantity col-8" value="' + od[i].quantity + '">'
+                    s += '</div><div class="form-group form-inline col-12"><strong class="col-4">Giá: &nbsp</strong>'
+                    s += '<input type="number" class="form-control price col-8" value="' + od[i].price + '">'
+                    s += '</div><div class="form-group form-inline col-12"><strong class="col-4">Kho: &nbsp</strong>'
+                    s += '<select class="form-control Warehouse col-8">'
+                    wd = w[i]
+                    for (j = 0; j < wd.length; j++) {
+                        s += '<option value="' + wd[j].id + '" quan="' + wd[j].quantity + '">' + wd[j].display + '</option>'
+                    }
+                    s += '</select></div></div><hr>';
+                    $('.order-detail').append(s)
+                }
+            },
+            function () {
+                alert('error detail order')
+            }
+        )
+    })
+    //confirm order
+    $(document).on('click', '#o-confirm', function () {
+        __w = $(".product-detail-order")
+        od = []
+        o = {}
+        o.id = $(".modal-body").attr('id_o')
+        o.full_name = $("input#Name").val()
+        o.shipping_fee = $("input#shipping-fee").val()
+        o.city = $("input#City").val()
+        o.province = $("input#Province").val()
+        o.address = $("input#Address").val()
+        o.total_price = parseInt(o.shipping_fee)
+
+        for (i = 0; i < __w.length; i++) {
+            wd = {}
+            wd.id_p = __w.eq(i).find(".name_product").attr('id_p')
+            wd.quan = __w.eq(i).find("input.quantity").val()
+            wd.price = __w.eq(i).find("input.price").val()
+            wd.id_w = __w.eq(i).find("option:selected").val()
+            wd.quan_w = __w.eq(i).find("option:selected").attr('quan') - wd.quan
+            if (wd.quan_w < 0) {
+                alert('Số lượng sản phẩm ' + __w.eq(i).find(".name_product").text() + ' quá lớn!!')
+                return
+            }
+            if (wd.price < 0) {
+                alert('Giá sản phẩm ' + __w.eq(i).find(".name_product").text() + ' bé hơn 0!!')
+                return
+            }
+            o.total_price += wd.quan * wd.price
+            od.push(wd)
+        }
+
+        const data = {
+            'od': od,
+            'o': o
+        }
+        console.log(data)
+        test = data
+        $.ajax({
+            type: "POST",
+            url: BASEURL + "/admin/confirmOrder",
+            data: data,
+            dataType: 'JSON'
+        }).then(
+            function (res) {
+                console.log(res)
+                if (res.status) {
+                    $("#order_table").DataTable().ajax.reload()
+                    $("#modify-order").modal('toggle')
+                } else {
+                    alert('error when confirm')
+                }
+            },
+            function () {
+                alert('erorr handle confirm')
+            }
+        )
+    })
+    // next status
+    $(document).on('click', '.next-status', function () {
+        id = $(this).attr('id_o')
+        $.ajax({
+            type: "POST",
+            url: BASEURL + "/admin/nextStatus",
+            data: { 'id': id },
+            dataType: 'JSON'
+        }).then(
+            function (res) {
+                console.log(res)
+                if (res.status) {
+                    $("#order_table").DataTable().ajax.reload()
+                } else {
+                    alert('error handle next status')
+                }
+            },
+            function () {
+                alert('error when handle')
+            }
+        )
+    })
+    // cancel
+    $(document).on('click', '.o-cancel', function () {
+        id = $(this).attr('id_o')
+        $.ajax({
+            type: "POST",
+            url: BASEURL + "/admin/cancel",
+            data: { 'id': id },
+            dataType: 'JSON'
+        }).then(
+            function (res) {
+                console.log(res)
+                if (res.status) {
+                    $("#order_table").DataTable().ajax.reload()
+                } else {
+                    alert('error handle next status')
+                }
+            },
+            function () {
+                alert('error when handle')
+            }
+        )
+    })
+    /**
+    * 
+    * INVOICE HANDLE admin site
+    * 
+    * 
+    */
+    // detail invoice
+    $(document).on('click', '#invoice_table .detail', function () {
+        o_id = $(this).attr('id_o')
+        $.ajax({
+            type: "POST",
+            url: BASEURL + "/admin/detailOrder",
+            data: { 'id_o': o_id },
+            dataType: 'JSON'
+        }).then(
+            function (res) {
+                console.log(res)
+                o = res.order
+                $(".modal-body").attr('id_o', o.id)
+                $("input#Name").val(o.full_name)
+                $("input#Phone").val(o.phone)
+                $("input#shipping-fee").val(o.shipping_fee)
+                $("input#City").val(o.city)
+                $("input#Province").val(o.province)
+                $("input#Address").val(o.address)
+                od = res.od
+                w = res.w
+                $('.order-detail').empty()
+                for (i = 0; i < od.length; i++) {
+                    s = '<div class="form-group product-detail-order row">'
+                    s += '<label class="col-12"><strong><i class="fas fa-boxes"></i> Tên sản phẩm: </strong>'
+                    s += '<span class="name_product" id_p="' + od[i].id_product + '">' + od[i].name + '</span></label>'
+                    s += '<div class="form-group form-inline col-12"><strong class="col-4">Số lượng: &nbsp</strong>'
+                    s += '<input type="number" class="form-control quantity col-8" value="' + od[i].quantity + '" disabled>'
+                    s += '</div><div class="form-group form-inline col-12"><strong class="col-4">Giá: &nbsp</strong>'
+                    s += '<input type="number" class="form-control price col-8" value="' + od[i].price + '" disabled>'
+                    s += '</div><div class="form-group form-inline col-12"><strong class="col-4">Kho: &nbsp</strong>'
+                    s += '<select class="form-control Warehouse col-8" disabled>'
+                    wd = w[i]
+                    for (j = 0; j < wd.length; j++) {
+                        if (od[i].id_warehouse == wd[j].id) {
+                            s += '<option selected value="' + wd[j].id + '" quan="' + wd[j].quantity + '">' + wd[j].name + '</option>'
+                        }
+                    }
+                    s += '</select></div></div><hr>';
+                    $('.order-detail').append(s)
+                }
+            },
+            function () {
+                alert('error detail order')
+            }
+        )
+    })
+    /**
+    * 
+    * ORDER CANCEL HANDLE admin site
+    * 
+    * 
+    */
+    // detail order cancel
+    $(document).on('click', '#order_cancel_table .detail', function () {
+        o_id = $(this).attr('id_o')
+        $.ajax({
+            type: "POST",
+            url: BASEURL + "/admin/detailOrder",
+            data: { 'id_o': o_id },
+            dataType: 'JSON'
+        }).then(
+            function (res) {
+                console.log(res)
+                o = res.order
+                $(".modal-body").attr('id_o', o.id)
+                $("input#Name").val(o.full_name)
+                $("input#Phone").val(o.phone)
+                $("input#shipping-fee").val(o.shipping_fee)
+                $("input#City").val(o.city)
+                $("input#Province").val(o.province)
+                $("input#Address").val(o.address)
+                od = res.od
+                w = res.w
+                $('.order-detail').empty()
+                for (i = 0; i < od.length; i++) {
+                    s = '<div class="form-group product-detail-order row">'
+                    s += '<label class="col-12"><strong><i class="fas fa-boxes"></i> Tên sản phẩm: </strong>'
+                    s += '<span class="name_product" id_p="' + od[i].id_product + '">' + od[i].name + '</span></label>'
+                    s += '<div class="form-group form-inline col-12"><strong class="col-4">Số lượng: &nbsp</strong>'
+                    s += '<input type="number" class="form-control quantity col-8" value="' + od[i].quantity + '" disabled>'
+                    s += '</div><div class="form-group form-inline col-12"><strong class="col-4">Giá: &nbsp</strong>'
+                    s += '<input type="number" class="form-control price col-8" value="' + od[i].price + '" disabled>'
+                    s += '</div><div class="form-group form-inline col-12"><strong class="col-4">Kho: &nbsp</strong>'
+                    s += '<select class="form-control Warehouse col-8" disabled>'
+                    wd = w[i]
+                    for (j = 0; j < wd.length; j++) {
+                        if (od[i].id_warehouse == wd[j].id) {
+                            s += '<option selected value="' + wd[j].id + '" quan="' + wd[j].quantity + '">' + wd[j].name + '</option>'
+                        }
+                    }
+                    s += '</select></div></div><hr>';
+                    $('.order-detail').append(s)
+                }
+            },
+            function () {
+                alert('error detail order')
+            }
+        )
     })
 })
 
@@ -1035,59 +1407,402 @@ $(document).ready(function () {
 /**
  * 
  * 
- * Handle for CART 
+ * Handle for CART
  * load, order, modify
  * 
  * 
  * 
  */
-loadCart = function (acc = "") {
-    if (acc == "") {
+
+formatPrice = function (price) {
+    r = "";
+    c = 0;
+    for (i = price.length - 1; i >= 0; i--) {
+        if (c % 3 == 0 && c != 0) {
+            r += ",";
+        }
+        r += price[i];
+        c++
+    }
+    return r.split("").reverse().join("");
+}
+$(document).ready(function () {
+    updateCD = function (input) {
+        val = input.val()
+        total_p = formatPrice((parseInt(price) * parseInt(val)).toString()) + " ₫"
+        input.parents('.cart_product').find('.total_price').text(total_p)
+        input.parents('.cart_product').find('.total_price').attr('total_p', (parseInt(price) * parseInt(val)))
+        total = 0
+        arr = $(".total_price")
+        for (i = 0; i < arr.length; i++) {
+            total += parseInt(arr.eq(i).attr('total_p'))
+        }
+        $("#tamtinh_c").text(formatPrice(total.toString()))
+        $("#thanhtien_c").text(formatPrice(total.toString()))
+        $("#tamtinh_c").attr('tien', total)
+        $("#thanhtien_c").attr('tien', total)
+    }
+    $(document).on('change', 'input.quantity-p', function () {
+        val = $(this).val()
+        price = $(this).parents('.cart_product').find('.price_p').attr('price_p')
+        id = $(this).attr('id_p')
+        account = $("strong.account_user").text()
         cart = JSON.parse(localStorage.getItem('cart'))
-        if (cart == null) {
-            $("#content").empty()
-            s = '<img src="' + '/public/assets/img/cart-empty.png" class="img-fluid">'
-            s += '<p class="text-secondary mt-3"><i>Chưa có sản phẩm nào</i></p>'
-            $("#content").append(s)
-            $("#content").addClass("bg-light text-center p-4")
-            $("#content").removeClass("row")
-        } else {
-            $("#quantity_sp").text(cart.length)
+        if (account == "") {
             for (i = 0; i < cart.length; i++) {
-                const data = {
-                    'id_p': cart[i].id
+                if (cart[i].id == id) {
+                    cart[i].quan = val
+                    break
                 }
-                $.ajax({
-                    type: 'POST',
-                    url: '/cart/getInfoByIdProduct',
-                    data: data,
-                    dataType: 'JSON'
-                }).then(
-                    function (res) {
-                        //     <div class="col-lg-6 col-md-6 col-12" style="padding-left:0; height:31px">
-                        //     <strong class="cart_index">Giỏ hàng (<span id="quantity_sp"></span> sản phẩm)</strong>
-                        // </div>
-                        // <div class="col-lg-2 col-md-2 hidden-xs">
-                        //     <h6 class="text-secondary"> Giá mua</h6>
-                        // </div>
-                        // <div class="col-lg-2 col-md-2 hidden-xs">
-                        //     <h6 class="text-secondary"> Số lượng</h6>
-                        // </div>
-                        // <div class="col-lg-2 col-md-2 hidden-xs">
-                        //     <h6 class="text-secondary"> Thành tiền</h6>
-                        // </div>
-                        test = res
-                        console.log(res)
-                    },
-                    function () {
-                        alert('error display')
-                    }
-                )
             }
+            localStorage.setItem('cart', JSON.stringify(cart))
+            updateCD($(this))
+        } else {
+            input = $(this)
+            const data = {
+                'id_p': id,
+                'quan': val
+            }
+            $.ajax({
+                type: 'POST',
+                url: BASEURL + '/cart/updateQuantity',
+                data: data,
+                dataType: 'JSON'
+            }).then(
+                function (res) {
+                    console.log(res)
+                    if (res.status) {
+                        updateCD(input)
+                    } else {
+                        alert('error updatecd')
+                    }
+                },
+                function () {
+                    alert('some error')
+                }
+            )
+        }
+    })
+    $(document).on('click', '.xoa_cart_p', function (e) {
+        e.preventDefault()
+        id = $(this).attr('id_p')
+        account = $("strong.account_user").text()
+        cart = JSON.parse(localStorage.getItem('cart'))
+        if (account == "") {
+            for (i = 0; i < cart.length; i++) {
+                if (cart[i].id == id) {
+                    cart.splice(i, 1)
+                    break
+                }
+            }
+            localStorage.setItem('cart', JSON.stringify(cart))
+            loadCart(account)
+        } else {
+            //remove cart detail
+            cd = $(this)
+            const data = {
+                'id_p': id
+            }
+            $.ajax({
+                type: 'POST',
+                url: BASEURL + '/cart/removeCartDetail',
+                data: data,
+                dataType: 'JSON'
+            }).then(
+                function (res) {
+                    if (res.status) {
+                        loadCart(account)
+                    } else {
+                        alert('error removecd')
+                    }
+                },
+                function () {
+                    alert('some error')
+                }
+            )
+        }
+    })
+})
+displayCart = function (cart) {
+    if (cart == null || cart.length == 0) {
+        $("#content").empty()
+        s = '<img src="' + BASEURL + '/img/cart-empty.png" class="img-fluid">'
+        s += '<p class="text-secondary mt-3"><i>Chưa có sản phẩm nào</i></p>'
+        $("#content").append(s)
+        $("#content").addClass("bg-light text-center p-4")
+        $("#content").removeClass("row")
+    } else {
+        $("#quantity_sp").text(cart.length)
+        total = 0
+        for (i = 0; i < cart.length; i++) {
+            const data = {
+                'id_p': cart[i].id,
+                'quan': cart[i].quan
+            }
+            $.ajax({
+                type: 'POST',
+                url: BASEURL + '/cart/getInfoByIdProduct',
+                data: data,
+                dataType: 'JSON'
+            }).then(
+                function (res) {
+                    res.p = JSON.parse(res.p)
+                    ct = '<hr>'
+                    ct += '<div class="row mt-1 cart_product"><div class="col-lg-6 col-md-6"><div class="row ml-2">'
+                    ct += '<div class="col-4 p-0"><a href="' + BASEURL + '/product/infoProduct/' + res.p.id + '">'
+                    ct += '<img class="img-fluid border img_p" src="/img/product.png" id_p="'+res.p.id+'"></a></div>'
+                    ct += '<div class="col-8 p-0 pl-3 d-flex align-items-start flex-column"><a class="name-product" href="' + BASEURL + '/product/infoProduct/' + res.p.id + '">'
+                    ct += res.p.name + '</a>' + '<div class="mt-auto"><a class="xoa_cart_p" href="" id_p="' + res.p.id + '">Xóa</a></div>'
+                    ct += '</div></div></div><div class="col-lg-2 col-md-2">'
+                    ct += '<p class="price-product mt-2 mb-2 price_p" price_p="' + res.p.price + '">' + formatPrice(res.p.price) + ' ₫</p></div>'
+                    ct += '<div class="col-lg-2 col-md-2">'
+                    ct += '<input type="number" class="form-control quantity-p" id_p="' + res.p.id + '"'
+                    ct += 'value="' + parseInt(res.quan) + '" min="1"></div>'
+                    ct += '<div class="col-lg-2 col-md-2">'
+                    ct += '<p class="price-product mt-2 mb-2 total_price" total_p="'
+                    ct += (parseInt(res.quan) * parseInt(res.p.price)) + '">'
+                    ct += formatPrice((parseInt(res.quan) * parseInt(res.p.price)).toString())
+                    ct += '₫</p></div></div>'
+                    loadImageProduct(res.p.id)
+                    $("#body_cart").append(ct)
+                    total += parseInt(res.quan) * parseInt(res.p.price)
+                    $("#tamtinh_c").text(formatPrice(total.toString()))
+                    $("#thanhtien_c").text(formatPrice(total.toString()))
+                    $("#tamtinh_c").attr('tien', total)
+                    $("#thanhtien_c").attr('tien', total)
+                },
+                function () {
+                    alert('error display')
+                }
+            )
         }
     }
 }
+loadCart = function (acc = "") {
+    if (acc == "") {
+        cart = JSON.parse(localStorage.getItem('cart'))
+        displayCart(cart)
+    } else {
+        $.ajax({
+            type: 'POST',
+            url: BASEURL + '/cart/getCartInfo',
+            dataType: 'JSON'
+        }).then(
+            function (res) {
+                for (i = 0; i < res.length; i++) {
+                    res[i] = JSON.parse(res[i])
+                }
+                displayCart(res)
+            },
+            function () {
+                alert('error load cart info')
+            }
+        )
+    }
+}
 //-------------------------------------END OF CART HANDLE
+
+
+
+
+/**
+ * 
+ * 
+ * Handle for ORDER
+ * display, input address, confirm 
+ * 
+ * 
+ * 
+ */
+displayOrder = function (cart) {
+    if (cart == null || cart.length == 0) {
+        $("#content").empty()
+        s = '<img src="' + BASEURL + '/img/cart-empty.png" class="img-fluid">'
+        s += '<p class="text-secondary mt-3"><i>Chưa có sản phẩm nào</i></p>'
+        $("#content").append(s)
+        $("#content").addClass("bg-light text-center p-4")
+        $("#content").removeClass("row")
+        return
+    }
+    tt = 0
+    total = 20000
+    for (i = 0; i < cart.length; i++) {
+        const data = {
+            'id_p': cart[i].id,
+            'quan': cart[i].quan
+        }
+        $.ajax({
+            type: 'POST',
+            url: BASEURL + '/cart/getInfoByIdProduct',
+            data: data,
+            dataType: 'JSON'
+        }).then(
+            function (res) {
+                res.p = JSON.parse(res.p)
+                ct = '<div class="row cart-detail" id_p="' + res.p.id + '"><div class="col-3">'
+                ct += '<a class="cart_list_product_img" href="' + BASEURL + '/product/infoProduct/' + res.p.id + '">'
+                ct += '<img class="img-fluid img_p" src="/img/product.png" id_p="' + res.p.id +'"></a></div>'
+                ct += '<div class="col-9 order-detail-p"><a class="name-product" href="' + BASEURL + '/product/infoProduct/' + res.p.id + '">'
+                ct += res.p.name + '</a><div class="d-flex"><p><span id="quantity">' + res.quan + '</span> x '
+                ct += '<span class="price-product" id="price" price_p="' + res.p.price + '">' + formatPrice(res.p.price) + '₫</span></p>'
+                ct += '<div class="ml-auto mr-2 price-product">' + formatPrice((parseInt(res.quan) * parseInt(res.p.price)).toString())
+                ct += '₫</div></div></div></div>'
+                ct += '<hr>'
+
+                $("#info-cart").append(ct)
+                total += parseInt(res.quan) * parseInt(res.p.price)
+                tt += parseInt(res.quan) * parseInt(res.p.price)
+                loadImageProduct(res.p.id)
+                $("#tamtinh_c").text(formatPrice(tt.toString()))
+                $("#thanhtien_c").text(formatPrice(total.toString()))
+                $("#tamtinh_c").attr('tien', tt)
+                $("#thanhtien_c").attr('tien', total)
+            },
+            function () {
+                alert('error display')
+            }
+        )
+    }
+}
+loadOrder = function (acc = "") {
+    if (acc == "") {
+        cart = JSON.parse(localStorage.getItem('cart'))
+        displayOrder(cart)
+    } else {
+        $.ajax({
+            type: 'POST',
+            url: BASEURL + '/cart/getCartInfo',
+            dataType: 'JSON'
+        }).then(
+            function (res) {
+                for (i = 0; i < res.length; i++) {
+                    res[i] = JSON.parse(res[i])
+                }
+                displayOrder(res)
+            },
+            function () {
+                alert('error load order info')
+            }
+        )
+    }
+}
+
+removeAllCD = function (Account) {
+    if (Account == "") {
+        localStorage.removeItem('cart')
+    } else {
+        $.ajax({
+            type: "POST",
+            url: BASEURL + "/cart/removeAllCartDetail"
+        }).then(
+            function (res) {
+            },
+            function () {
+                alert('error')
+            }
+        )
+    }
+}
+$(document).ready(function () {
+    $("#btn-tt").click(function () {
+        arr = $(".cart-detail")
+        cd_arr = []
+        total = 20000
+        for (i = 0; i < arr.length; i++) {
+            quan = arr.eq(i).find('span#quantity').text()
+            price = arr.eq(i).find('span#price').attr('price_p')
+            total += parseInt(quan) * parseInt(price)
+            cd = [
+                arr.eq(i).attr('id_p'),
+                quan,
+                price
+            ]
+            cd_arr.push(cd);
+        }
+        od = {
+            'Account': $('strong.account_user').text(),
+            'FullName': $("input#FullName").val(),
+            'Phone': $('input#Phone').val(),
+            'Address': $('input#Address').val(),
+            'City': $('input#City').val(),
+            'Province': $('input#Province').val(),
+            'Total': total.toString(),
+            'Cd': cd_arr
+        }
+
+        if (od.FullName == "") {
+            $(".FullName").addClass("is-invalid")
+            return
+        }
+        else
+            $(".FullName").removeClass("is-invalid")
+
+        if (od.Phone == "") {
+            $(".Phone").addClass("is-invalid")
+            return
+        }
+        else
+            $(".Phone").removeClass("is-invalid")
+
+        if (od.Address == "") {
+            $(".Address").addClass("is-invalid")
+            return
+        }
+        else
+            $(".Address").removeClass("is-invalid")
+
+        if (od.City == "") {
+            $(".City").addClass("is-invalid")
+            return
+        }
+        else
+            $(".City").removeClass("is-invalid")
+
+        if (od.Province == "") {
+            $(".Province").addClass("is-invalid")
+            return
+        }
+        else
+            $(".Province").removeClass("is-invalid")
+
+        $.ajax({
+            type: 'POST',
+            url: BASEURL + '/order/order',
+            data: od,
+            dataType: 'JSON'
+        }).then(
+            //success
+            function (res) {
+                if (res.status) {
+                    removeAllCD(od.Account)
+                    s = '<div class="row pr-4 pl-2 pt-2">'
+                    s += '<b class="col">Họ và tên: </b>'
+                    s += '<p class="col">' + od.FullName + '</p></div>'
+                    s += '<div class="row pr-4 pl-2">'
+                    s += '<b class="col">Số điện thoại: </b>'
+                    s += '<p class="col">' + od.Phone + '</p></div>'
+                    s += '<div class="row pr-4 pl-2">'
+                    s += '<b class="col">Địa chỉ: </b>'
+                    s += '<p class="col">' + od.Address + ', ' + od.Province + ', ' + od.City + '</p></div>'
+                    s += '<div class="row"><i class="col text-secondary">*Đặt hàng thành công, '
+                    s += 'có điện thoại xác nhận trong 24h tới</i></div>'
+                    $("#info-order").html(s)
+                } else {
+                    alert('fail order')
+                }
+            },
+            //fail
+            function () {
+                alert('error order')
+            }
+        )
+    })
+})
+
+
+
+//-------------------------------------END OF ORDER HANDLE
+
 
 
 
@@ -1100,6 +1815,25 @@ loadCart = function (acc = "") {
  * 
  * 
  */
+
+LoadImageForProductInfoSite = function (id) {
+    $.ajax({
+        type: "POST",
+        url: "/product/GetImageProduct",
+        data: { 'id': id },
+        dataType: 'JSON'
+    }).then(
+        function (res) {
+            if (res.img != "none") {
+                $(".img_product").attr('src', getImgHex(res.img));
+            } 
+        },
+        function () {
+            alert("error img")
+        }
+    )
+}
+
 $(document).ready(function () {
     $(".addToCart").click(function () {
         const data = {
@@ -1110,12 +1844,13 @@ $(document).ready(function () {
         if ($(".account_user").text() != "") {
             $.ajax({
                 type: 'POST',
-                url: '/product/addCart',
+                url: BASEURL + '/product/addCart',
                 data: data,
                 dataType: 'JSON'
             }).then(
                 function (res) {
                     if (res.status == true) {
+                        $('.alert').remove()
                         s = '<div class="container mt-3 alert alert-success alert-dismissible fade show" role="alert">'
                         s += 'Thêm vào giỏ thành công'
                         s += '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
@@ -1153,13 +1888,38 @@ $(document).ready(function () {
                     cart.push(r)
                 }
             }
-            console.log(cart)
+            $('.alert').remove()
             localStorage.setItem('cart', JSON.stringify(cart))
+            s = '<div class="container mt-3 alert alert-success alert-dismissible fade show" role="alert">'
+            s += 'Thêm vào giỏ thành công'
+            s += '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+            s += '<span aria-hidden="true">&times;</span></button>'
+            s += '</div>'
+            $("nav").after(s)
         }
     })
 })
 //-------------------------------------END OF PRODUCT HANDLE
 
+
+loadImgUser = function () {
+    $.ajax({
+        type: "POST",
+        url: "/user/GetImgUser",
+        dataType: 'JSON'
+    }).then(
+        function (res) {
+            if (res == "none") {
+                $("img#img").attr('src', "/img/user.png")
+            } else {
+                $("img#img").attr('src', getImgHex(res))
+            }
+        },
+        function () {
+            alert("error img")
+        }
+    )
+}
 
 
 /**
@@ -1187,7 +1947,7 @@ $(document).ready(function () {
         val = $(this).val()
         $(this).removeClass("is-invalid")
     })
-    $('#signup').click(function () {
+    $(document).on('click', '#signup', function () {
         $(".alert").remove()
         const userData = {
             'Account': $("#Account").val(),
@@ -1504,16 +2264,9 @@ $(document).ready(function () {
     $("#luu").click(function () {
         const userData = {
             'Account': $("#Account").text(),
-            'Password': "",
-            'FullName': "",
-            'Email': "",
-            'Phone': "",
-            'Address': "",
-            'City': "",
-            'Province': "",
-            'Img': $('#img').attr('src').split("")
+            'Img': $('#img').attr('src')
         }
-        //console.log(userData)
+        console.log(userData)
         $.ajax({
             type: "POST",
             url: '/user/setImgUser',
@@ -1541,8 +2294,8 @@ $(document).ready(function () {
             url: '/user/deleteAccount'
         }).then(
             // resolve/success callback
-            function (response) {
-                location.href = '/user/logout_s'
+            function (res) {
+                location.href = '/user/logout'
             },
             // reject/failure callback
             function () {

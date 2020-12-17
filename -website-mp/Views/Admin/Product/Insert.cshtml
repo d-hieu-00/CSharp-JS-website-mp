@@ -1,17 +1,9 @@
-<?php include "../application/views/admin/_assets/header.php" ?>
-<!-- Topbar -->
-<div class="container-fluid bg-white mb-4 text-center shadow" id="admin-navbar">
-    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top">
-        <!-- Sidebar Toggle (Topbar) -->
-        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-            <i class="fa fa-bars"></i>
-        </button>
-        <!-- Topbar info -->
-        <div class="sidebar-heading">
-            Thêm sản phẩm mới
-        </div>
-    </nav>
-</div>
+﻿@{
+    ViewData["Title"] = "Admin - Home mate";
+    ViewData["_info"] = "Thêm sản phẩm mới";
+    Layout = "_LayoutAdmin";
+}
+
 <!-- Begin Page Content -->
 <div class="container-fluid row m-0">
     <div class="col-md-1"></div>
@@ -19,7 +11,8 @@
         <div class="card-header">
             <div class="row">
                 <h6 class="col-md-6 d-flex align-items-center font-weight-bold text-primary">
-                    Tạo sản phẩm</h6>
+                    Tạo sản phẩm
+                </h6>
             </div>
         </div>
         <div class="card-body">
@@ -73,7 +66,7 @@
                                 <strong>Ảnh sản phẩm</strong>
                             </label>
                             <div class="hovereffect">
-                                <img id="img-product" width="150px" src="<?php echo BASEURL?>/public/assets/img/product.png">
+                                <img id="img-product" width="150" src="~/img/product.png">
                                 <div class="overlay">
                                     <label for="Img" class="info">Chọn file ảnh</label>
                                     <input id="Img" type="file" class="form-control Img" name="Img" accept="image/*" hidden>
@@ -85,7 +78,6 @@
                         <div class="form-group">
                             <label for="Type-product"><strong>Loại sản phẩm</strong></label>
                             <select class="form-control Type-product" name="Type-product">
-
                             </select>
                         </div>
 
@@ -93,7 +85,6 @@
                             <div class="col-md-6 Warehouse">
                                 <label for="Warehouse"><strong>Kho</strong></label>
                                 <select class="form-control Warehouse" id="Warehouse" name="Warehouse">
-
                                 </select>
                             </div>
                             <div class="col-md-4 Quantity">
@@ -137,10 +128,11 @@
 </div>
 
 <!-- /.container-fluid -->
-<?php include "../application/views/admin/_assets/footer.php" ?>
-<script>
-    $(document).ready(function() {
-        loadPage("#productPage")
-        loadInsertP();
-    })
-</script>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            loadPage("#productPage")
+            loadInsertP();
+        })
+    </script>
+}

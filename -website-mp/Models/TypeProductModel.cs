@@ -16,7 +16,7 @@ namespace _website_mp.Models
             db = new Database();
         }
 
-        public string[][] getTypeProductByIdCategory(string id_category)
+        public string[][] GetTypeProductByIdCategory(string id_category)
         {
             string query = "select tp.id, tp.name from mp_type_product tp where tp.id_category = @p1 ";
             int num_col = 2;

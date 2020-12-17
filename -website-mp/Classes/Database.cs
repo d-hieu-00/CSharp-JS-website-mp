@@ -141,7 +141,7 @@ namespace _website_mp.Classes
          * 
          * Run query select with param or non param
          * 
-         * Return string is first row of first col or empty string
+         * Return true if select has some rows or false if select no rows
          * 
          */
         public bool QuerySelect(string query, List<string> param = null)

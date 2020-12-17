@@ -1,13 +1,13 @@
 ﻿
 <div class="container-md text-center">
-    <a href="~/home/index">
+    <a href="/">
         <img class="img-fluid" src="~/img/logo.png" alt="banner">
     </a>
 </div>
 
 <nav class="navbar navbar-expand-md site-nav sticky-top">
     <div class="container pt-2 pb-2">
-        <a class="navbar-brand pl-2 pr-4 border-right"  asp-controller="admin" asp-action="index">
+        <a class="navbar-brand pl-2 pr-4 border-right"  asp-controller="home" asp-action="index">
             <i class="fa fa-home" aria-hidden="true"></i> <strong>Trang chủ</strong>
         </a>
 
@@ -46,7 +46,7 @@
 
 
             <form class="form-inline pl-2">
-                <input class="form-control mr-1" type="text" placeholder="Nhập tên sản phẩm" aria-label="Tìm kiếm">
+                <input id="sreach" class="form-control mr-1" type="text" placeholder="Nhập tên sản phẩm" aria-label="Tìm kiếm">
                 <button id="sreach-product" class="btn btn-outline-secondary pl-2 pr-2" type="button">
                     <i class="fa fa-search" aria-hidden="true"></i>
                 </button>

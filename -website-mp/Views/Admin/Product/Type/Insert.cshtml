@@ -1,17 +1,9 @@
-<?php include "../application/views/admin/_assets/header.php" ?>
-<!-- Topbar -->
-<div class="container-fluid bg-white mb-4 text-center shadow" id="admin-navbar">
-    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top">
-        <!-- Sidebar Toggle (Topbar) -->
-        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-            <i class="fa fa-bars"></i>
-        </button>
-        <!-- Topbar info -->
-        <div class="sidebar-heading">
-            Thêm loại sản phẩm mới
-        </div>
-    </nav>
-</div>
+﻿@{
+    ViewData["Title"] = "Admin - Home mate";
+    ViewData["_info"] = "Thêm loại sản phẩm mới";
+    Layout = "_LayoutAdmin";
+}
+
 <!-- Begin Page Content -->
 <div class="container-fluid row m-0">
     <div class="col-md-3"></div>
@@ -19,7 +11,8 @@
         <div class="card-header">
             <div class="row">
                 <h6 class="col-md-6 d-flex align-items-center font-weight-bold text-primary">
-                    Tạo loại sản phẩm</h6>
+                    Tạo loại sản phẩm
+                </h6>
             </div>
         </div>
         <div class="card-body">
@@ -29,7 +22,7 @@
                 <div class="col-md-8">
                     <div class="form-group">
                         <label for="Name"><strong>Tên loại sản phẩm</strong></label>
-                        <input type="text" id="Name" class="form-control Name" placeholder="Nhập tên kho hàng">
+                        <input type="text" id="Name" class="form-control Name" placeholder="Nhập tên loại sản phẩm">
                         <div class="NameError invalid-feedback">
                             Chưa nhập tên loại sản phẩm!!
                         </div>
@@ -53,8 +46,9 @@
                         </select>
                     </div>
                     <div class="d-flex justify-content-end">
-                    <button type="button" id="taoloaisp" class="btn btn-primary">
-                        Tạo loại sản phẩm</button>
+                        <button type="button" id="taoloaisp" class="btn btn-primary">
+                            Tạo loại sản phẩm
+                        </button>
                     </div>
                 </div>
             </form>
@@ -65,9 +59,10 @@
     </div>
 </div>
 <!-- /.container-fluid -->
-<?php include "../application/views/admin/_assets/footer.php" ?>
-<script>
-    $(document).ready(function() {
-        loadPage("#productPage")
-    })
-</script>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            loadPage("#productPage")
+        })
+    </script>
+}

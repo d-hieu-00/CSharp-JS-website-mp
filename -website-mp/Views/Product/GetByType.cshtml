@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Home mate";
+    Layout = "_Layout";
+}
+<partial name="~/Views/Shared/nav.cshtml" />
+<div class="container">
+    <div class="row row-cols-1 row-cols-sm-3 row-cols-md-5" id="bodyy">
+        @{
+            string[] arr = ViewBag.arr;
+            if (arr.Length > 0)
+            {
+                foreach (string val in arr)
+                {
+                    @Html.Raw(val)
+                }
+            }
+            else
+            {
+                <div class="alert alert-danger text-center mt-3">
+                    <strong>Không có sản phẩm để hiển thị</strong>
+                </div>
+            }
+        }
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            loadCategory()
+            paging()
+            loadImageAllProduct()
+        })
+    </script>
+}

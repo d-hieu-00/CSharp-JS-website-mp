@@ -24,7 +24,7 @@ namespace _website_mp.Controllers
             List<string[][]> rs = new List<string[][]>();
             for (int i = 1; i < 5; i++)
             {
-                string[][] r = model.getTypeProductByIdCategory(Convert.ToString(i));
+                string[][] r = model.GetTypeProductByIdCategory(Convert.ToString(i));
                 rs.Add(r);
             }
             return JsonConvert.SerializeObject(rs.ToArray());

@@ -63,9 +63,8 @@ namespace _website_mp.Controllers
         public string LoginAccount(string Account, string Password)
         {
             Dictionary<string, string> res = new Dictionary<string, string>();
-            bool ck = true;
             var userModel = new UserModel();
-            ck =  userModel.CheckAccount(Account);
+            bool ck = userModel.CheckAccount(Account);
             if (ck == false)
                 res.Add("AccountError", "Tài khoản không tồn tại");
             else
@@ -176,7 +175,6 @@ namespace _website_mp.Controllers
             char[] _Img = Img.ToCharArray();
             List<byte> img = new List<byte>();
 
-
             foreach (char i in _Img)
             {
                 img.Add(Convert.ToByte(i));
@@ -186,6 +184,39 @@ namespace _website_mp.Controllers
             res.Add("img", img.ToArray()[0].ToString());
             if (userModel.SetImg(img.ToArray(), Account))
             {
+                res.Add("status", "1");
+            }
+            else
+            {
+                res.Add("status", "0");
+            }
+            return JsonConvert.SerializeObject(res);
+        }
+
+        public string UpdateUser(string FullName, string Email, string Address, string City, string Province)
+        {
+            Dictionary<string, string> res = new Dictionary<string, string>();
+            string Account = HttpContext.Session.GetString("Account");
+            var userModel = new UserModel();
+            if (userModel.UpdateAccount(Account, FullName, Email, Address, City, Province))
+            {
+                res.Add("status", "1");
+            }
+            else
+            {
+                res.Add("status", "0");
+            }
+            return JsonConvert.SerializeObject(res);
+        }
+
+        public string DeleteAccount()
+        {
+            Dictionary<string, string> res = new Dictionary<string, string>();
+            string Account = HttpContext.Session.GetString("Account");
+            var userModel = new UserModel();
+            if (userModel.DeleteAccount(Account))
+            {
+                HttpContext.Session.Remove("Account");
                 res.Add("status", "1");
             }
             else

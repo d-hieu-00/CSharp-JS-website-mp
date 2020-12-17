@@ -1,17 +1,9 @@
-<?php include "../application/views/admin/_assets/header.php" ?>
-<!-- Topbar -->
-<div class="container-fluid bg-white mb-4 text-center shadow">
-    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4">
-        <!-- Sidebar Toggle (Topbar) -->
-        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-            <i class="fa fa-bars"></i>
-        </button>
-        <!-- Topbar info -->
-        <div class="sidebar-heading">
-            Thông tin kho hàng
-        </div>
-    </nav>
-</div>
+﻿@{
+    ViewData["Title"] = "Admin - Home mate";
+    ViewData["_info"] = "Thông tin kho hàng";
+    Layout = "_LayoutAdmin";
+}
+
 <!-- Begin Page Content -->
 <div class="container-fluid mt-4">
 
@@ -19,7 +11,8 @@
         <div class="card-header">
             <div class="row">
                 <h6 class="col-md-6 d-flex align-items-center font-weight-bold text-primary">
-                    Tất cả kho hàng</h6>
+                    Tất cả kho hàng
+                </h6>
                 <!-- Table Search -->
                 <div class="col-md-6 d-flex justify-content-end form-inline find-input">
                     <input type="text" class="form-control find" placeholder="Tìm kiếm theo cột..." tb_id="warehouse_table">
@@ -28,7 +21,7 @@
                         <option selected value="1">Tên kho</option>
                         <option value="2">Họ và tên</option>
                         <option value="3">Tỉnh/ thành phố</option>
-                        <option value="4">Huyện</option>
+                        <option value="4">Quận/ huyện</option>
                         <option value="5">Địa chỉ chi tiết</option>
                     </select>
                 </div>
@@ -42,7 +35,7 @@
                         <th>STT</th>
                         <th>Tên kho</th>
                         <th>Tỉnh/ thành phố</th>
-                        <th>Huyện</th>
+                        <th>Quận/ huyện</th>
                         <th>Địa chỉ chi tiết</th>
                         <th>Trạng thái</th>
                         <th>Sửa</th>
@@ -57,7 +50,6 @@
     </div>
 </div>
 <!-- /.container-fluid -->
-
 <!-- Modal modify warehouse -->
 <div class="modal fade" id="modify-warehouse" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -124,11 +116,12 @@
                     <div class="card-header">
                         <div class="row">
                             <h6 class="col-md-4 d-flex align-items-center font-weight-bold text-primary">
-                                Chi tiết kho</h6>
+                                Chi tiết kho
+                            </h6>
                             <!-- Table Search -->
                             <div class="col-md-8 d-flex justify-content-end form-inline find-input">
-                                <input type="text" class="form-control find" 
-                                placeholder="Tìm kiếm theo cột..." tb_id="warehouse_detail_table">
+                                <input type="text" class="form-control find"
+                                       placeholder="Tìm kiếm theo cột..." tb_id="warehouse_detail_table">
 
                                 <select class="form-control ml-2">
                                     <option selected value="1">Tên sản phẩm</option>
@@ -147,7 +140,7 @@
                                     <th>Tên sản phẩm</th>
                                     <th>Thương hiệu</th>
                                     <th>Số lượng</th>
-                                    <th>Ngày nhập mới</th>
+                                    <!-- <th>Ngày nhập mới</th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -162,10 +155,11 @@
         </div>
     </div>
 </div>
-<?php include "../application/views/admin/_assets/footer.php" ?>
-<script>
-    $(document).ready(function() {
-        loadPage("#warehousePage")
-        initTable("#warehouse_table", "/admin/getAllWarehouse")
-    })
-</script>
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            loadPage("#warehousePage")
+            @*initTable("#warehouse_table", "/admin/getAllWarehouse")*@
+        })
+    </script>
+}

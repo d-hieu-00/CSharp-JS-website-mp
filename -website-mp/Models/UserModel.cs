@@ -62,7 +62,7 @@ namespace _website_mp.Models
             return Db.Query(query, param);
         }
 
-        public string getIdUser(string Account)
+        public string GetIdUser(string Account)
         {
             string query = "select id from view_user where account=@p1";
             List<string> param = new List<string>
@@ -77,7 +77,7 @@ namespace _website_mp.Models
             string query = "update mp_customer set date_last_access = SYSDATE() where id_user = @p1";
             List<string> param = new List<string>
             {
-                getIdUser(Account)
+                GetIdUser(Account)
             };
             return Db.Query(query, param) > 0;
         }
@@ -119,6 +119,33 @@ namespace _website_mp.Models
             {
                 Password,
                 Account
+            };
+            return Db.Query(query, param) > 0;
+        }
+
+        public bool DeleteAccount(string Account)
+        {
+            string query = "update mp_customer set status='DISABLE' where id_user=@p1";
+            List<string> param = new List<string>
+            {
+                GetIdUser(Account)
+            };
+            return Db.Query(query, param) > 0;
+        }
+
+        public bool UpdateAccount(string Account, string FullName, string Email, string Address,
+            string City, string Province)
+        {
+            string query = "update mp_customer set full_name=@p1, email=@p2, address=@p3, " +
+                "city=@p4, province=@p5 where id_user=@p6";
+            List<string> param = new List<string>
+            {
+                FullName,
+                Email,
+                Address,
+                City,
+                Province,
+                GetIdUser(Account)
             };
             return Db.Query(query, param) > 0;
         }
