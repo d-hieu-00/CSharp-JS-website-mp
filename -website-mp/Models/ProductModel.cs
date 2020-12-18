@@ -94,5 +94,87 @@ namespace _website_mp.Models
             }
             return true;
         }
+
+        public bool ActiveProduct(string id)
+        {
+            string query = "update mp_product set status='ACTIVE' where id=@p1";
+            List<string> param = new List<string>()
+            {
+                id
+            };
+            return Db.Query(query, param) > 0;
+        }
+
+        public bool DisableProduct(string id)
+        {
+            string query = "update mp_product set status='DISABLE' where id=@p1";
+            List<string> param = new List<string>()
+            {
+                id
+            };
+            return Db.Query(query, param) > 0;
+        }
+
+        public string[] Get(string id)
+        {
+            string query = "select * from mp_product where id=@p1";
+            List<string> param = new List<string>()
+            {
+                id
+            };
+            return Db.QuerySelect(query, 12, param).ToArray()[0];
+        }
+
+        public string[][] GetWarehouse(string id)
+        {
+            string query = "select wd.id_warehouse, wd.quantity from mp_warehouse_detail wd join mp_warehouse w " +
+                " on wd.id_warehouse = w.id where wd.id_product =? and w.status = 'ACTIVE'";
+            List<string> param = new List<string>()
+            {
+                id
+            };
+            return Db.QuerySelect(query, 2, param).ToArray();
+        }
+
+        public bool Save(string name, string brand, string color, string price,
+            byte[] img,  string short_discription, string discription, string id_type, string id)
+        {
+            string query = "update mp_product set img=@p1, name=@p2, brand=@p3, color=@p4, price=@p5, " +
+                " short_discription=@p6, discription=@p7, id_type=@p8 where id=@p9";
+            List<string> param = new List<string>()
+            {
+                name,
+                brand,
+                color,
+                price,
+                short_discription,
+                discription,
+                id_type,
+                id
+            };
+            return Db.QueryImg(query, img, param) > 0;
+        }
+
+        public string Insert(string name, string brand, string color, string price,
+            byte[] img, string short_discription, string discription, string id_type)
+        {
+            string query = "insert into mp_product(name,brand,color,price,img,short_discription,discription,id_type) " +
+                " values(@p2,@p3,@p4,@p5,@p1,@p6,@p7,@p8)";
+            List<string> param = new List<string>()
+            {
+                name,
+                brand,
+                color,
+                price,
+                short_discription,
+                discription,
+                id_type
+            };
+            if (Db.QueryImg(query, img, param) > 0)
+            {
+                return Db.QuerySelect("select id from mp_product ORDER by id DESC", 1).ToArray()[0][0];
+            }
+            return null;
+        }
     }
 }

@@ -254,10 +254,12 @@ loadInsertP = function () {
         // resolve/success callback
         function (response) {
             if (response.status) {
+                response.data = JSON.parse(response.data)
+                for (i = 0; i < response.data.length; i++) response.data[i] = JSON.parse(response.data[i])
                 $("select.Type-product option").remove()
                 s = ""
                 for (i = 0; i < response.data.length; i++) {
-                    s += '<option value="' + response.data[i][0] + '">' + response.data[i][1] + '</option>'
+                    s += '<option value="' + response.data[i]['id'] + '">' + response.data[i]['name'] + '</option>'
                 }
                 $("select.Type-product").append(s)
             }
@@ -275,6 +277,8 @@ loadInsertP = function () {
         // resolve/success callback
         function (response) {
             if (response.status) {
+                response.data = JSON.parse(response.data)
+                for (i = 0; i < response.data.length; i++) response.data[i] = JSON.parse(response.data[i])
                 p = $("div.form-row")
                 $("button.AddWarehouse").removeAttr('disabled')
                 for (i = 1; i < p.length; i++) p.eq(i).remove()
@@ -282,7 +286,7 @@ loadInsertP = function () {
                 $("select.Warehouse option").remove()
                 s = ""
                 for (i = 0; i < response.data.length; i++) {
-                    s += '<option value="' + response.data[i][0] + '">' + response.data[i][1] + '</option>'
+                    s += '<option value="' + response.data[i]['id'] + '">' + response.data[i]['name'] + '</option>'
                 }
                 $("select.Warehouse").append(s)
 
@@ -355,7 +359,6 @@ $(document).ready(function () {
         } else {
             link = "/admin/activeUser"
         }
-        status = false
         $.ajax({
             type: "POST",
             url: BASEURL + link,
@@ -364,8 +367,8 @@ $(document).ready(function () {
         }).then(
             // resolve/success callback
             function (response) {
-                if (response.status) {
-                    status = true;
+                if (response.status == true) {
+                    $("#user_table").DataTable().ajax.reload()
                 }
             },
             // reject/failure callback
@@ -373,16 +376,6 @@ $(document).ready(function () {
                 alert('There was some error!');
             }
         )
-        if (status) {
-            $("#user_table").DataTable().ajax.reload()
-            a = $(".status")
-            for (i = 0; i < a.length; i++) {
-                if (a.eq(i).attr('account') == $(this).attr('account')) {
-                    a.eq(i).toggleClass('btn-danger')
-                    a.eq(i).toggleClass('btn-success')
-                }
-            }
-        }
     })
 
     /**
@@ -397,7 +390,6 @@ $(document).ready(function () {
         } else {
             link = "/admin/activeWarehouse"
         }
-        status = false
         $.ajax({
             type: "POST",
             url: BASEURL + link,
@@ -407,7 +399,7 @@ $(document).ready(function () {
             // resolve/success callback
             function (response) {
                 if (response.status) {
-                    status = true;
+                    $("#warehouse_table").DataTable().ajax.reload()
                 }
             },
             // reject/failure callback
@@ -415,23 +407,6 @@ $(document).ready(function () {
                 alert('There was some error!');
             }
         )
-        if (status) {
-            $("#warehouse_table").DataTable().ajax.reload()
-            a = $(".status")
-            for (i = 0; i < a.length; i++) {
-                if (a.eq(i).attr('id_w') == $(this).attr('id_w')) {
-                    a.eq(i).toggleClass('btn-success')
-                    a.eq(i).toggleClass('btn-danger')
-                    if (a.eq(i).text() == "ACTIVE") {
-                        a.eq(i).parents('tr').find('button.modify').removeAttr('disabled')
-                        a.eq(i).parents('tr').find('button.detail').removeAttr('disabled')
-                    } else {
-                        a.eq(i).parents('tr').find('button.modify').attr('disabled', 'true')
-                        a.eq(i).parents('tr').find('button.detail').attr('disabled', 'true')
-                    }
-                }
-            }
-        }
     })
     /**
      * 
@@ -451,7 +426,7 @@ $(document).ready(function () {
             'province': w_modify.parents('tr').find('span.w-province').text(),
             'address': w_modify.parents('tr').find('span.w-address').text(),
         }
-
+        console.log(data)
         $("#modify-warehouse .modal-body input.Name").val(data.name)
         $("#modify-warehouse .modal-body input.City").val(data.city)
         $("#modify-warehouse .modal-body input.Province").val(data.province)
@@ -540,6 +515,7 @@ $(document).ready(function () {
             }).then(
                 //success
                 function (response) {
+                    $(".alert").remove()
                     if (response.status == true) {
                         s = '<div class="alert alert-success text-center" role="alert">'
                         s += 'Thêm kho hàng thành công thành công!!'
@@ -556,7 +532,6 @@ $(document).ready(function () {
                         s += '</div>'
                         $("#admin-navbar").after(s)
                     }
-                    console.log(response)
                 },
                 //error
                 function () {
@@ -688,6 +663,7 @@ $(document).ready(function () {
             }).then(
                 //success
                 function (response) {
+                    $(".alert").remove()
                     if (response.status == true) {
                         s = '<div class="alert alert-success text-center" role="alert">'
                         s += 'Thêm loại sản phẩm thành công thành công!!'
@@ -726,7 +702,6 @@ $(document).ready(function () {
         } else {
             link = "/admin/activeProduct"
         }
-        status = false
         $.ajax({
             type: "POST",
             url: BASEURL + link,
@@ -736,7 +711,7 @@ $(document).ready(function () {
             // resolve/success callback
             function (response) {
                 if (response.status) {
-                    status = true;
+                    $("#product_table").DataTable().ajax.reload()
                 }
             },
             // reject/failure callback
@@ -744,21 +719,6 @@ $(document).ready(function () {
                 alert('There was some error!');
             }
         )
-        if (status) {
-            $("#product_table").DataTable().ajax.reload()
-            a = $(".status")
-            for (i = 0; i < a.length; i++) {
-                if (a.eq(i).attr('id_w') == $(this).attr('id_p')) {
-                    a.eq(i).toggleClass('btn-success')
-                    a.eq(i).toggleClass('btn-danger')
-                    if (a.eq(i).text() == "ACTIVE") {
-                        a.eq(i).parents('tr').find('button.modify').removeAttr('disabled')
-                    } else {
-                        a.eq(i).parents('tr').find('button.modify').attr('disabled', 'true')
-                    }
-                }
-            }
-        }
     })
     /**
      * 
@@ -837,6 +797,7 @@ $(document).ready(function () {
         }).then(
             // resolve/success callback
             function (response) {
+                response.data = JSON.parse(response.data)
                 $("input#Name").val(response.data['name'])
                 $("input#Brand").val(response.data['brand'])
                 $("input#Color").val(response.data['color'])
@@ -847,6 +808,31 @@ $(document).ready(function () {
                 $("input#Short-Description").val(response.data['short_discription'])
                 $("textarea#Description").val(response.data['discription'])
                 TypeProduct = response.data['id_type']
+
+                $.ajax({
+                    type: "POST",
+                    url: BASEURL + "/admin/getTypeProductForTagSelect",
+                    dataType: 'JSON'
+                }).then(
+                    // resolve/success callback
+                    function (response) {
+                        if (response.status) {
+                            response.data = JSON.parse(response.data)
+                            for (i = 0; i < response.data.length; i++) response.data[i] = JSON.parse(response.data[i])
+                            $("select.Type-product option").remove()
+                            s = ""
+                            for (i = 0; i < response.data.length; i++) {
+                                s += '<option value="' + response.data[i]['id'] + '">' + response.data[i]['name'] + '</option>'
+                            }
+                            $("select.Type-product").append(s)
+                            $("select.Type-product option[value='" + TypeProduct + "'").attr('selected', 'true')
+                        }
+                    },
+                    // reject/failure callback
+                    function () {
+                        alert('There was some error tp!');
+                    }
+                )
             },
             // reject/failure callback
             function () {
@@ -854,28 +840,6 @@ $(document).ready(function () {
             }
         )
 
-        $.ajax({
-            type: "POST",
-            url: BASEURL + "/admin/getTypeProductForTagSelect",
-            dataType: 'JSON'
-        }).then(
-            // resolve/success callback
-            function (response) {
-                if (response.status) {
-                    $("select.Type-product option").remove()
-                    s = ""
-                    for (i = 0; i < response.data.length; i++) {
-                        s += '<option value="' + response.data[i][0] + '">' + response.data[i][1] + '</option>'
-                    }
-                    $("select.Type-product").append(s)
-                    $("select.Type-product option[value='" + TypeProduct + "'").attr('selected', 'true')
-                }
-            },
-            // reject/failure callback
-            function () {
-                alert('There was some error tp!');
-            }
-        )
         Warehouse = null
         $.ajax({
             type: "POST",
@@ -886,7 +850,9 @@ $(document).ready(function () {
             // resolve/success callback
             function (response) {
                 if (response.status) {
+                    response.data = JSON.parse(response.data)
                     Warehouse = response.data
+                    for (i = 0; i < Warehouse.length; i++) Warehouse[i] = JSON.parse(Warehouse[i])
                     $("input.Quantity").val(0)
                     $.ajax({
                         type: "POST",
@@ -896,6 +862,8 @@ $(document).ready(function () {
                         // resolve/success callback
                         function (response) {
                             if (response.status) {
+                                response.data = JSON.parse(response.data)
+                                for (i = 0; i < response.data.length; i++) response.data[i] = JSON.parse(response.data[i])
                                 p = $("div.form-row")
                                 $("button.AddWarehouse").removeAttr('disabled')
                                 for (i = 1; i < p.length; i++) p.eq(i).remove()
@@ -903,7 +871,7 @@ $(document).ready(function () {
                                 $("select.Warehouse option").remove()
                                 s = ""
                                 for (i = 0; i < response.data.length; i++) {
-                                    s += '<option value="' + response.data[i][0] + '">' + response.data[i][1] + '</option>'
+                                    s += '<option value="' + response.data[i]['id'] + '">' + response.data[i]['name'] + '</option>'
                                 }
                                 $("select.Warehouse").append(s)
 
@@ -1093,8 +1061,9 @@ $(document).ready(function () {
             dataType: 'JSON'
         }).then(
             function (res) {
+                formatOrderDetail(res)
                 o = res.order
-                $(".modal-body").attr('id_o', o.id)
+                $("#modify-order .modal-body").attr('id_o', o.id)
                 $("input#Name").val(o.full_name)
                 $("input#Phone").val(o.phone)
                 $("input#shipping-fee").val(o.shipping_fee)
@@ -1103,7 +1072,7 @@ $(document).ready(function () {
                 $("input#Address").val(o.address)
                 od = res.od
                 w = res.w
-                $('.order-detail').empty()
+                $('#modify-order .order-detail').empty()
                 for (i = 0; i < od.length; i++) {
                     s = '<div class="form-group product-detail-order row">'
                     s += '<label class="col-12"><strong><i class="fas fa-boxes"></i> Tên sản phẩm: </strong>'
@@ -1130,9 +1099,10 @@ $(document).ready(function () {
     //confirm order
     $(document).on('click', '#o-confirm', function () {
         __w = $(".product-detail-order")
+        _od = []
         od = []
         o = {}
-        o.id = $(".modal-body").attr('id_o')
+        o.id = $("#modify-order .modal-body").attr('id_o')
         o.full_name = $("input#Name").val()
         o.shipping_fee = $("input#shipping-fee").val()
         o.city = $("input#City").val()
@@ -1147,6 +1117,13 @@ $(document).ready(function () {
             wd.price = __w.eq(i).find("input.price").val()
             wd.id_w = __w.eq(i).find("option:selected").val()
             wd.quan_w = __w.eq(i).find("option:selected").attr('quan') - wd.quan
+            _wd = [
+                wd.id_p,
+                wd.quan,
+                wd.price,
+                wd.id_w,
+                wd.quan_w
+            ]
             if (wd.quan_w < 0) {
                 alert('Số lượng sản phẩm ' + __w.eq(i).find(".name_product").text() + ' quá lớn!!')
                 return
@@ -1156,12 +1133,20 @@ $(document).ready(function () {
                 return
             }
             o.total_price += wd.quan * wd.price
-            od.push(wd)
+            _od.push(_wd)
         }
-
+        _o = [
+            o.id,
+            o.full_name,
+            o.shipping_fee,
+            o.city,
+            o.province,
+            o.address,
+            o.total_price
+        ]
         const data = {
-            'od': od,
-            'o': o
+            'od': _od,
+            'o': _o
         }
         console.log(data)
         test = data
@@ -1229,14 +1214,20 @@ $(document).ready(function () {
             }
         )
     })
-    /**
-    * 
-    * INVOICE HANDLE admin site
-    * 
-    * 
-    */
-    // detail invoice
-    $(document).on('click', '#invoice_table .detail', function () {
+    formatOrderDetail = function (res) {
+        res.order = JSON.parse(res.order)
+        res.od = JSON.parse(res.od)
+        res.w = JSON.parse(res.w)
+        for (i = 0; i < res.od.length; i++) {
+            res.od[i] = JSON.parse(res.od[i])
+            res.w[i] = JSON.parse(res.w[i])
+            for (j = 0; j < res.w[i].length; j++) {
+                res.w[i][j] = JSON.parse(res.w[i][j])
+            }
+        }
+    }
+    // detail order
+    $(document).on('click', '#order_table .detail', function () {
         o_id = $(this).attr('id_o')
         $.ajax({
             type: "POST",
@@ -1245,18 +1236,19 @@ $(document).ready(function () {
             dataType: 'JSON'
         }).then(
             function (res) {
+                formatOrderDetail(res)
                 console.log(res)
                 o = res.order
-                $(".modal-body").attr('id_o', o.id)
-                $("input#Name").val(o.full_name)
-                $("input#Phone").val(o.phone)
-                $("input#shipping-fee").val(o.shipping_fee)
-                $("input#City").val(o.city)
-                $("input#Province").val(o.province)
-                $("input#Address").val(o.address)
+                $("#detail-order .modal-body").attr('id_o', o.id)
+                $("input#Name_m").val(o.full_name)
+                $("input#Phone_m").val(o.phone)
+                $("input#shipping-fee_m").val(o.shipping_fee)
+                $("input#City_m").val(o.city)
+                $("input#Province_m").val(o.province)
+                $("input#Address_m").val(o.address)
                 od = res.od
                 w = res.w
-                $('.order-detail').empty()
+                $('#detail-order .order-detail').empty()
                 for (i = 0; i < od.length; i++) {
                     s = '<div class="form-group product-detail-order row">'
                     s += '<label class="col-12"><strong><i class="fas fa-boxes"></i> Tên sản phẩm: </strong>'
@@ -1285,11 +1277,11 @@ $(document).ready(function () {
     /**
     * 
     * ORDER CANCEL HANDLE admin site
-    * 
+    * INVOICE HANDLE admin site
     * 
     */
-    // detail order cancel
-    $(document).on('click', '#order_cancel_table .detail', function () {
+    // detail order cancel, invoice
+    $(document).on('click', '#order_cancel_table .detail, #invoice_table .detail', function () {
         o_id = $(this).attr('id_o')
         $.ajax({
             type: "POST",
@@ -1298,6 +1290,7 @@ $(document).ready(function () {
             dataType: 'JSON'
         }).then(
             function (res) {
+                formatOrderDetail(res)
                 console.log(res)
                 o = res.order
                 $(".modal-body").attr('id_o', o.id)
@@ -1533,6 +1526,7 @@ displayCart = function (cart) {
         $("#content").removeClass("row")
     } else {
         $("#quantity_sp").text(cart.length)
+        $("#body_cart").empty()
         total = 0
         for (i = 0; i < cart.length; i++) {
             const data = {
@@ -2011,8 +2005,7 @@ $(document).ready(function () {
             }).then(
                 // resolve/success callback
                 function (response) {
-                    test = response
-                    console.log(response)
+                    $(".alert").remove()
                     if (response.status == true) {
                         s = '<div class="alert alert-success text-center" role="alert">'
                         s += 'Tạo tài khoản thành công!! <a href="/user/login/" class="alert-link">Nhấn để đăng nhập</a>'
@@ -2070,6 +2063,7 @@ $(document).ready(function () {
             }).then(
                 // resolve/success callback
                 function (response) {
+                    $(".alert").remove()
                     if (response.status == true) {
                         location.href = "/home/index";
                     } else {
@@ -2162,6 +2156,7 @@ $(document).ready(function () {
             }).then(
                 // resolve/success callback
                 function (response) {
+                    $(".alert").remove()
                     if (response.status == true) {
                         s = '<div class="alert alert-success text-center" role="alert">'
                         s += 'Lưu thông tin tài khoản thành công!!'
@@ -2222,7 +2217,7 @@ $(document).ready(function () {
             }).then(
                 // resolve/success callback
                 function (response) {
-                    console.log(response)
+                    $(".alert").remove()
                     if (response.status == true) {
                         s = '<div class="alert alert-success text-center" role="alert">'
                         s += 'Lưu mật khẩu mới thành công!!'

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace _website_mp.Classes
@@ -23,6 +24,17 @@ namespace _website_mp.Classes
             char[] rev = rs.ToCharArray();
             Array.Reverse(rev);
             return new string(rev);
+        }
+        public static byte[] StringToByteArray(string input)
+        {
+            char[] temp = input.ToCharArray();
+            List<byte> result = new List<byte>();
+
+            foreach (char i in temp)
+            {
+                result.Add(Convert.ToByte(i));
+            }
+            return result.ToArray();
         }
     }
 }

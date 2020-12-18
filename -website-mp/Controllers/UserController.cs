@@ -7,6 +7,7 @@ using _website_mp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using _website_mp.Classes;
 
 namespace _website_mp.Controllers
 {
@@ -172,17 +173,8 @@ namespace _website_mp.Controllers
         public string SetImgUser(string Account, string Img)
         {
             Dictionary<string, string> res = new Dictionary<string, string>();
-            char[] _Img = Img.ToCharArray();
-            List<byte> img = new List<byte>();
-
-            foreach (char i in _Img)
-            {
-                img.Add(Convert.ToByte(i));
-            }
-
             var userModel = new UserModel();
-            res.Add("img", img.ToArray()[0].ToString());
-            if (userModel.SetImg(img.ToArray(), Account))
+            if (userModel.SetImg(Functions.StringToByteArray(Img), Account))
             {
                 res.Add("status", "1");
             }

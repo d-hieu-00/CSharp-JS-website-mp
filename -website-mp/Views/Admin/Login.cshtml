@@ -30,6 +30,12 @@
                     </label>
                     <input type="password" id="Password" name="Password" class="form-control Password" placeholder="Nhập mật khẩu" required>
                 </div>
+                @{ 
+                    if (ViewData["msg"] != null)
+                    {
+                        <div class="alert alert-danger text-center" role="alert">@ViewData["msg"]</div>
+                    }
+                }
                 <div class="text-center">
                     <button type="submit" class="btn btn-primary ">Đăng nhập</button>
                 </div>

@@ -149,5 +149,21 @@ namespace _website_mp.Models
             };
             return Db.Query(query, param) > 0;
         }
+
+        public string[][] GetAll()
+        {
+            string query = "select * from view_user";
+            return Db.QuerySelect(query, 14).ToArray();
+        }
+
+        public bool AcitveAccount(string Account)
+        {
+            string query = "update mp_customer set status='ACTIVE' where id_user=@p1";
+            List<string> param = new List<string>
+            {
+                GetIdUser(Account)
+            };
+            return Db.Query(query, param) > 0;
+        }
     }
 }
