@@ -1520,7 +1520,7 @@ displayCart = function (cart) {
     if (cart == null || cart.length == 0) {
         $("#content").empty()
         s = '<img src="' + BASEURL + '/img/cart-empty.png" class="img-fluid">'
-        s += '<p class="text-secondary mt-3"><i>Chưa có sản phẩm nào</i></p>'
+        s += '<p class="text-secondary mt-3"><i>Chưa có sản phẩm nào <a href="/">tiếp tục mua sắm!!</a></i></p>'
         $("#content").append(s)
         $("#content").addClass("bg-light text-center p-4")
         $("#content").removeClass("row")

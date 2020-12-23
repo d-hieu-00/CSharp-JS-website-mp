@@ -94,6 +94,51 @@
     </div>
 
 
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <div class="row">
+                <h6 class="col-md-6 d-flex align-items-center font-weight-bold text-primary">
+                    Các sản phẩm được mua nhiều trong tháng
+                </h6>
+                <!-- Table Search -->
+                <div class="col-md-6 d-flex justify-content-end form-inline find-input">
+                    <input type="text" class="form-control find"
+                           placeholder="Tìm kiếm theo cột..." tb_id="product_trend">
 
+                    <select class="form-control ml-2">
+                        <option selected value="1">Tên sản phẩm</option>
+                        <option value="2">Số lượng sản phẩm</option>
+                        <option value="3">Số lượng đã bán</option>
+                        <option value="4">Số hóa đơn được lập</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+
+            <table id="product_trend" class="display w-100">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng sản phẩm</th>
+                        <th>Số lượng đã bán</th>
+                        <th>Số hóa đơn được lập</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <!-- /.container-fluid -->
+
+@section scripts{ 
+    <script>
+        $(document).ready(function () {
+            loadPage("#homePage")
+            initTable("#product_trend", "/admin/GetTrending")
+        })
+    </script>
+}

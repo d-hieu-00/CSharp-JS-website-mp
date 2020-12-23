@@ -26,13 +26,27 @@ namespace _website_mp.Models
             return r.ToArray();
         }
 
+        public string[][] GetAllForDisplay()
+        {
+            string query = "select mp.id, mp.name, mp.brand, mp.color, mp.price, mp.img, mp.short_discription, mp.discription," +
+                " tp.id type_id, tp.name type_name, sum(wd.quantity) quantity, mp.status, mp.date_created, mp.date_modify" +
+                " FROM((mp_product mp join mp_type_product tp on mp.id_type = tp.id) left join mp_warehouse_detail wd" +
+                " on mp.id = wd.id_product) left join(select id from mp_warehouse where status = 'ACTIVE') w" +
+                " on w.id = wd.id_warehouse where tp.status='ACTIVE' and mp.status='ACTIVE' group by wd.id_product, mp.id";
+
+            List<string[]> r = Db.QuerySelect(query, 14);
+            if (r == null) { return null; }
+            return r.ToArray();
+        }
+
         public string[][] GetByType(string id)
         {
             string query = "select mp.id, mp.name, mp.brand, mp.color, mp.price, mp.img, mp.short_discription, mp.discription," +
                 " tp.id type_id, tp.name type_name, sum(wd.quantity) quantity, mp.status, mp.date_created, mp.date_modify" +
                 " FROM((mp_product mp join mp_type_product tp on mp.id_type = tp.id) left join mp_warehouse_detail wd" +
                 " on mp.id = wd.id_product) left join(select id from mp_warehouse where status = 'ACTIVE') w" +
-                " on w.id = wd.id_warehouse where tp.id=@p1 group by wd.id_product, mp.id";
+                " on w.id = wd.id_warehouse where tp.id=@p1 and tp.status='ACTIVE' and mp.status='ACTIVE' " +
+                " group by wd.id_product, mp.id";
             List<string> param = new List<string>()
             {
                 id

@@ -20,8 +20,8 @@ namespace _website_mp.Controllers
             if(HttpContext.Session.GetString("Admin") != null)
             {
                 var orderModel = new OrderModel();
-                ViewData["earn-month"] = orderModel.EarnMonth();
-                ViewData["earn-anual"] = orderModel.EarnYear();
+                ViewData["earn-month"] = Functions.FormatPrice(orderModel.EarnMonth());
+                ViewData["earn-anual"] = Functions.FormatPrice(orderModel.EarnYear());
                 ViewData["pending"] = orderModel.Pending();
                 ViewData["shipping"] = orderModel.Shipping();
                 return View("Index");
@@ -30,6 +30,28 @@ namespace _website_mp.Controllers
             {
                 return View("Login");
             }
+        }
+        
+        public string GetTrending()
+        {
+            var orderModel = new OrderModel();
+            string[][] at = orderModel.GetTrending();
+            Dictionary<string, string[][]> res = new Dictionary<string, string[][]>();
+            List<string[]> rs = new List<string[]>();
+            int i = 1;
+            foreach (string[] val in at)
+            {
+                // id 0, name 1, quantity 2, quantity_sold 3, num_order 4 
+                List<string> r = new List<string>();
+                r.Add("<span>" + (i++) + "</span>");
+                r.Add("<span>" + val[1] + "</span>");
+                r.Add("<span>" + val[2] + "</span>");
+                r.Add("<span>" + val[3] + "</span>");
+                r.Add("<span>" + val[4] + "</span>");
+                rs.Add(r.ToArray());
+            }
+            res.Add("data", rs.ToArray());
+            return JsonConvert.SerializeObject(res);
         }
         
         public ViewResult Login(string Password)

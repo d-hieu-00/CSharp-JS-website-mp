@@ -14,7 +14,7 @@ namespace _website_mp.Controllers
         public string GetAllProduct()
         {
             var producModel = new ProductModel();
-            string[][] arr = producModel.GetAll();
+            string[][] arr = producModel.GetAllForDisplay();
             List<string> res = new List<string>();
             foreach(string[] val in arr)
             {

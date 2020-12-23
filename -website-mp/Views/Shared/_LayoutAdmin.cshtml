@@ -128,12 +128,14 @@
                             <i class="fa fa-bars"></i>
                         </button>
                         <!-- Topbar info -->
-                        <div class="sidebar-heading">
-                            @ViewData["_info"]
+                        <div class="sidebar-heading text-warning text-lg">
+                            <b>
+                                @ViewData["_info"]
+                            </b>
                         </div>
                     </nav>
                 </div>
-                @RenderBody();
+                @RenderBody()
             </div>
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">

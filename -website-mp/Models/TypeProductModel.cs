@@ -18,7 +18,7 @@ namespace _website_mp.Models
 
         public string[][] GetTypeProductByIdCategory(string id_category)
         {
-            string query = "select tp.id, tp.name from mp_type_product tp where tp.id_category = @p1 ";
+            string query = "select tp.id, tp.name from mp_type_product tp where tp.id_category = @p1 and tp.status='ACTIVE'";
             int num_col = 2;
             List<string> param = new List<string>
             {
@@ -35,6 +35,16 @@ namespace _website_mp.Models
                 " c.name name_category, tp.status, tp.date_created " +
                 " from(mp_type_product tp left join mp_product p on tp.id = p.id_type) " +
                 " join mp_category c on tp.id_category = c.id " +
+                " group by p.id_type, tp.id";
+            return Db.QuerySelect(query, 7).ToArray();
+        }
+
+        public string[][] GetAllForDisplay()
+        {
+            string query = "select tp.id, tp.name, count(p.id_type) quantity, c.id id_category, " +
+                " c.name name_category, tp.status, tp.date_created " +
+                " from(mp_type_product tp left join mp_product p on tp.id = p.id_type) " +
+                " join mp_category c on tp.id_category = c.id where tp.status='ACTIVE' " +
                 " group by p.id_type, tp.id";
             return Db.QuerySelect(query, 7).ToArray();
         }

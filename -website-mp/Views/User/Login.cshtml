@@ -38,3 +38,15 @@
         </form>
     </div>
 </div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $("#Password").keyup(function (e) {
+                if (e.keyCode == 13) {
+                    $("#login").trigger('click')
+                }
+            })
+        })
+    </script>
+}

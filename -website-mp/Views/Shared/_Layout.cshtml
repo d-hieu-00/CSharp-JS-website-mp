@@ -45,26 +45,26 @@
             </a>
 
             <div class="dropdown-menu dropdown-menu-md-right">
-            @{
-                if (acc != null)
-                {
-                    <a class="dropdown-item" href="/user/profile">
-                        <i class="far fa-id-card"></i>
-                        Thông tin tài khoản
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="/user/logout">
-                        <i class="fas fa-sign-out-alt"></i> 
-                        Đăng xuất
-                    </a>
+                @{
+                    if (acc != null)
+                    {
+                        <a class="dropdown-item" href="/user/profile">
+                            <i class="far fa-id-card"></i>
+                            Thông tin tài khoản
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/user/logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Đăng xuất
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="dropdown-item" href="/user/login">
+                            <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                        </a>
+                    }
                 }
-                else
-                {
-                    <a class="dropdown-item" href="/user/login">
-                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
-                    </a>
-                }
-            }
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="~/user/signup">
                     <i class="fa fa-plus-square" aria-hidden="true"></i> Tạo tài khoản
@@ -72,8 +72,9 @@
             </div>
         </div>
     </header>
-    
-        @RenderBody()
+
+    @RenderBody()
+    <div style="min-height: calc(100vh - 600px);"></div>
     <footer class="site-footer">
 
         <div class="container py-5 mt-3">
@@ -86,45 +87,33 @@
                 </div>
 
                 <div class="col-6 col-md">
-                    <h5>Danh mục chính</h5>
+                    <h5>Danh mục nổi bậc</h5>
                     <ul class="list-unstyled text-small">
-                        <li><a class="text-muted" href="#">Cool stuff</a></li>
-                        <li><a class="text-muted" href="#">Random feature</a></li>
-                        <li><a class="text-muted" href="#">Team feature</a></li>
-                        <li><a class="text-muted" href="#">Stuff for developers</a></li>
-                        <li><a class="text-muted" href="#">Another one</a></li>
-                        <li><a class="text-muted" href="#">Last time</a></li>
+                        <li><a class="text-muted" href="/product/getbytype/3">Trang điểm môi</a></li>
+                        <li><a class="text-muted" href="/product/getbytype/5">Dưỡng da</a></li>
+                        <li><a class="text-muted" href="/product/getbytype/10">Nước hoa nữ</a></li>
+                        <li><a class="text-muted" href="/product/getbytype/4">Mask - mặt nạ</a></li>
                     </ul>
                 </div>
 
                 <div class="col-6 col-md">
-                    <h5>Nguồn</h5>
+                    <h5>Thành viên phát triển</h5>
                     <ul class="list-unstyled text-small">
-                        <li><a class="text-muted" href="#">Resource</a></li>
-                        <li><a class="text-muted" href="#">Resource name</a></li>
-                        <li><a class="text-muted" href="#">Another resource</a></li>
-                        <li><a class="text-muted" href="#">Final resource</a></li>
+                        <li class="text-muted">18520746 - Nguyễn Duy Hiệu</li>
+                        <li class="text-muted">18521016 - Bạch Thanh Long</li>
+                        <li class="text-muted">18521325 - Đỗ Thị Thảo Quỳnh</li>
                     </ul>
                 </div>
 
-                <div class="col-6 col-md">
-                    <h5>Nhóm phát triển</h5>
-                    <ul class="list-unstyled text-small">
-                        <li><a class="text-muted" href="#">Business</a></li>
-                        <li><a class="text-muted" href="#">Education</a></li>
-                        <li><a class="text-muted" href="#">Government</a></li>
-                        <li><a class="text-muted" href="#">Gaming</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-6 col-md">
+                <div class="col-6 col-md text-break">
                     <h5>Thông tin</h5>
-                    <ul class="list-unstyled text-small">
-                        <li><a class="text-muted" href="#">Team</a></li>
-                        <li><a class="text-muted" href="#">Locations</a></li>
-                        <li><a class="text-muted" href="#">Privacy</a></li>
-                        <li><a class="text-muted" href="#">Terms</a></li>
-                    </ul>
+                    <address>
+                        <p><b>Địa chỉ: </b><span class="text-info">
+                        Khu phố 6, Phường Linh Trung, Quận Thủ Đức, Thành Phố Hồ Chí Minh
+                        </span></p>
+                    </address>
+                    <p><b>Điện Thoại: </b><span class="text-info">0965 690 984</span></p>
+                    <p><b>Email: </b><span class="text-info">duyhieu90768@gmail.com</span></p>
                 </div>
             </div>
         </div>
@@ -133,6 +122,15 @@
     <script src="~/bootstrap-4.5.3-dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/DataTables/datatables.js"></script>
     <script src="~/js/my-script.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#sreach").keyup(function (e) {
+                if (e.keyCode == 13) {
+                    $("#sreach-product").trigger('click')
+                }
+            })
+        })
+    </script>
     @RenderSection("scripts", false)
 </body>
 </html>

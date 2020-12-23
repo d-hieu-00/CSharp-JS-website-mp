@@ -159,14 +159,26 @@ namespace _website_mp.Models
 
         public string Pending()
         {
-            string query = "select count(id) r from mp_order where status='Chờ xác nhận'";
+            string query = "select if(count(id)=null,0,count(id)) r from mp_order where status='Chờ xác nhận'";
             return Db.QuerySelect(query, 1).ToArray()[0][0];
         }
 
         public string Shipping()
         {
-            string query = "select count(id) r from mp_order where status='Đang giao'";
+            string query = "select if(count(id)=null,0,count(id)) r from mp_order where status='Đang giao'";
             return Db.QuerySelect(query, 1).ToArray()[0][0];
+        }
+
+        public string[][] GetTrending()
+        {
+            string query = "SELECT p.id, p.name, sum(wd.quantity) quantity, sum(od.quantity) quantity_sold, " +
+                " count(DISTINCT o.id) num_order " +
+                " FROM((mp_product p join(mp_warehouse_detail wd join(" +
+                " select id from mp_warehouse w where w.status = 'ACTIVE') w on w.id = wd.id_warehouse) " +
+                " on p.id = wd.id_product) left join mp_order_detail od on p.id = od.id_product) join mp_order o " +
+                " on od.id_order = o.id " +
+                " WHERE month(o.date_modify)= month(sysdate()) GROUP by p.id";
+            return Db.QuerySelect(query, 5).ToArray();
         }
 
         public bool Order(string FullName, string Phone, string Address, string City, string Province, 
